@@ -1,0 +1,71 @@
+/* In general, the canvases need position:absolute*/
+.canvas
+{
+	position: absolute;
+	z-score: 1;
+	
+}
+
+.stimulusCanvas
+{
+	position: absolute;
+	z-score: 2;
+	
+}
+
+/* The second canvas needs to have position relative, and be floated to the right*/
+#myStimulusCanvas2
+{
+	float:right;
+	position:relative;
+	
+}
+
+.instructions
+{
+	text-align: left;
+	font-size: 20px;
+	
+}
+
+
+div.whole {
+	width: 600px;
+    height:50px;
+	margin: auto;
+
+}
+
+
+div.rating 
+{
+width: 100px;
+height:50px;
+float:left;
+text-align:center;
+
+}
+
+div.continue
+
+{
+	position: relative;
+	margin:auto;
+	
+}
+
+
+/* Load DIGI font */
+@font-face {
+    font-family: 'ds-digitalnormal';
+    src: url('ds-digi-webfont.eot');
+    src: url('ds-digi-webfont.eot?#iefix') format('embedded-opentype'),
+         url('ds-digi-webfont.woff2') format('woff2'),
+         url('ds-digi-webfont.woff') format('woff'),
+         url('ds-digi-webfont.ttf') format('truetype'),
+         url('ds-digi-webfont.svg#ds-digitalnormal') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+

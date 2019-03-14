@@ -1,0 +1,482 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Hello</title>
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	
+	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+	
+    <script src="jspsych-4.3/jspsych.js"></script>
+    <script src="jspsych-4.3/plugins/jspsych-text.js"></script>
+    <script src="jspsych-4.3/plugins/jspsych-instructions.js"></script>
+    <script src="jspsych-4.3/plugins/jspsych-single-stim.js"></script>
+	<script src="jspsych-4.3/plugins/jspsych-survey-likert.js"></script>
+	<script src="jspsych-4.3/plugins/jspsych-html.js"></script>
+	<script src="jspsych-4.3/plugins/jspsych-survey-text.js"></script>
+    <script src="jspsych-4.3/plugins/jspsych-xabpositionleft.js"></script>
+    <script src="jspsych-4.3/plugins/jspsych-doublestim_mome.js"></script>
+    <script src="jspsych-4.3/plugins/jspsych-fullscreen.js"></script>
+	<script src="jspsych-4.3/plugins/jspsych-survey-multi-choice-mod.js"></script>
+
+    <link href="jspsych-4.3/css/jspsych.css" rel="stylesheet" type="text/css"></link>
+	   
+    <!-- Import css file -->
+     <link type="text/css" rel="stylesheet" href="stylesheet.css"/>
+ 
+	<!-- Import experiments -->
+        <script src="draw_stimulus.js"></script> 
+        <script src="randperm.js"></script> 
+        <script src="draw_blankstimulus.js"></script> 
+		<script src="draw_feedback_mome.js"></script>
+		<script src="metatask_mome.js"></script>
+		<script src="stimdeviset.js"></script>
+		<script src="staircase2edit.js"></script>
+
+		<script>
+		
+		
+//CODE THAT PREVENTS THEM FROM PRESSING SPACEBAR AND GOING DOWN THE WEBPAGE
+		
+		window.onkeydown = function(e) 
+{
+	if(e.keyCode == 32 && e.target == document.body) 
+	{
+		e.preventDefault();
+		return false;
+	}
+};
+
+		</script>
+		
+      </head>
+    <body>
+		<div id='jspsych-target' style='width:800; height:auto; position:relative;'></div> 
+		<canvas class = "canvas" id="myCanvas"></canvas>	
+		<canvas class = "stimulusCanvas" id="myInnerCanvas"></canvas>
+		<canvas class = "stimulusCanvas" id="myInnerCanvas2"></canvas>
+		<canvas class = "canvas" id="myBlankstimCanvas"></canvas>
+		<canvas class = "canvas" id="myFeedbackCanvas"></canvas>
+	</body>
+    <script type="text/javascript">
+	
+
+	
+//CODE THAT CHECKS IF THE BROWSER IS CHROME OR FIREFOX MOZ
+function getBrowserInfo() 
+{ 
+        var ua = navigator.userAgent, tem, 
+        M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || []; 
+        if(/trident/i.test(M[1])) 
+        { 
+                tem=  /\brv[ :]+(\d+)/g.exec(ua) || []; 
+                return 'IE '+(tem[1] || ''); 
+        } 
+        if(M[1]=== 'Chrome') 
+        { 
+                tem= ua.match(/\b(OPR|Edge)\/(\d+)/); 
+                if(tem!= null) return tem.slice(1).join(' ').replace('OPR', 'Opera'); 
+        } 
+        M = M[2]? [M[1], M[2]]: [navigator.appName, navigator.appVersion, '-?']; 
+        if((tem= ua.match(/version\/(\d+)/i))!= null) 
+                M.splice(1, 1, tem[1]); 
+        return { 'browser': M[0], 'version': M[1] }; 
+} 
+
+var browserInfo = getBrowserInfo(); 
+if(browserInfo.browser !== 'Chrome' && browserInfo.browser !== 'Firefox') 
+{ 
+        var wrong_browser = 
+        { 
+                type: 'text', 
+                text: '<p>This experiment only has support for Google Chrome or Mozilla Firefox.</p>' 
+                         +'<p>Please reopen the experiment in one of these browsers.</p>', 
+        }; 
+        jsPsych.init({ 
+                experiment_structure: [wrong_browser], 
+        }); 
+} 
+else 
+
+
+//IF BROWSER IS OK, LEAD ON TO THE EXPERIMENT
+
+//CODE TO RUN THE EXPERIMENT STARTS HERE
+{ 
+         
+		 
+//WEB AND CANVAS PARAMETERS
+ 
+  //Set up the canvas and get the window height and width.
+  	var canvas = document.getElementById("myCanvas");
+  	var context = canvas.getContext("2d");
+  	context.canvas.width  = 800; 
+  	context.canvas.height =  600 * 9.0 / 10.0;
+	var centerWidth = canvas.width / 2.0;
+	var centerHeight = canvas.height / 2.0;
+	
+//Canvas for stimulus 1
+	var innerCanvas = document.getElementById("myInnerCanvas");
+	var innerContext = innerCanvas.getContext("2d");
+	innerContext.canvas.width  = 800/2.0; // Half the width of the screen
+	innerContext.canvas.height = 600 * 9.0 / 10.0; // Leave room for prompts
+	var innerCenterWidth = innerCanvas.width / 2.0;
+	var innerCenterHeight = innerCanvas.height / 2.0;
+
+
+//Canvas for stimulus 2
+	var innerCanvas2 = document.getElementById("myInnerCanvas2");
+	var innerContext2 = innerCanvas2.getContext("2d");
+	innerContext2.canvas.width  = 800/2.0; // Half the width of the screen
+	innerContext2.canvas.height = 600 * 9.0 / 10.0; // Leave room for prompts
+	var innerCenterWidth2 = innerCanvas2.width / 2.0;
+	var innerCenterHeight2 = innerCanvas2.height / 2.0;
+	
+//Canvas for blank stim
+	var blankstimCanvas = document.getElementById("myBlankstimCanvas");
+	var blankstimContext = blankstimCanvas.getContext("2d");
+	blankstimContext.canvas.width  = 800; // Full width of the screen
+	blankstimContext.canvas.height = 600 * 9.0 / 10.0; // Leave room for prompts
+	var blankstimCenterWidth =blankstimCanvas.width / 2.0;
+	var blankstimCenterHeight = blankstimCanvas.height / 2.0;
+
+	
+//Canvas for feedback
+	var feedbackCanvas = document.getElementById("myFeedbackCanvas");
+	var feedbackContext = feedbackCanvas.getContext("2d");
+	feedbackContext.canvas.width  = 800; // Full width of the screen
+	feedbackContext.canvas.height = 600 * 9.0 / 10.0; // Leave room for prompts
+	var feedbackCenterWidth = feedbackCanvas.width / 2.0;
+	var feedbackCenterHeight = feedbackCanvas.height / 2.0;
+	
+	
+
+
+
+//CODE TO SAVE FULLDATA AT THE END
+function save_data(alldata){
+  var data_table = "mydatabase"; // change this for different experiments
+  $.ajax({
+      type:'post',
+      cache: false,
+      url: 'savedata.php',
+      data: {
+         table: data_table,
+         json: JSON.stringify(alldata)
+      },
+     success: function(output) { console.log(output); } // write the result to javascript console
+   });
+};
+
+
+//CODE TO SAVE DATA PER TRIAL
+function save_data_pt(alldata){
+  var data_table = "mydatabase_trialdata"; // change this for different experiments
+  $.ajax({
+      type:'post',
+      cache: false,
+      url: 'savedata.php',
+      data: {
+         table: data_table,
+         json: JSON.stringify(alldata)
+      },
+     success: function(output) { console.log(output); } // write the result to javascript console
+   });
+}		;
+					
+	
+					
+					
+
+//EXPERIMENT PARAMETERS
+       
+			
+		var practice  = 1;
+		var numPrac   = 26;
+		var numBlocks = 3;
+		var numTrials = 36;
+		var subject_id = Math.floor(Math.random()*9000000) + 1000000;
+		
+		
+		
+//CODE TO GET WORKER ID FROM THE URL FROM MTURK
+
+	function $_GET(param) 
+	{
+		var vars = {};
+		window.location.href.replace( 
+			/[?&]+([^=&]+)=?([^&]*)?/gi, // regexp
+			function( m, key, value ) { // callback
+				vars[key] = value !== undefined ? value : '';
+			}
+		);
+
+		if ( param ) 
+		{
+			return vars[param] ? vars[param] : null;	
+		}
+		return vars;
+	}
+
+	
+//GET THE WORKERID
+		if ($_GET('workerId') !== null)
+     	{var worker_id = $_GET('workerId');}
+		else
+		  { 
+		  
+
+//IF WORKERID IS NOT APPENDED, GENERATE RANDOM WORKERID FOR THEM
+		var rannum = Math.floor(Math.random()*900000000000) + 100000000000;
+		var worker_id = 'A' +rannum+ 'Z';
+				  
+		}
+		
+
+			
+		
+//CODE TO GENERATE AND CHECK FOR UNIQUE SUBJECT ID		
+function checkSubID(curSubID)
+{
+	$.ajax({
+		type:'post',
+		cache: false,
+		url: 'checkSubID.php',
+		data: 
+		{
+			curbSubID: curSubID
+		},
+		success: function(output) 
+		{
+		
+			exists=output.match(/\d/);
+
+			if (exists[0] === 1 || exists[0] === '1')
+			{
+				//alert(subject_id +' exists, try again: ');
+				subject_id = Math.floor(Math.random()*9000000) + 1000000;
+				checkSubID(subject_id);
+			}
+			else
+			{
+				jsPsych.data.addProperties({subject_id: subject_id});
+			}
+		},
+		error: function (xhr, ajaxOptions, thrownError) 
+		{
+			alert(thrownError);
+		}
+	});
+}
+			
+
+			
+//CHECK IF WORKERID ALREADY EXISTS IN DATA, IF SO, PREVENT ACCESS FROM EXPERIMENT	
+function checkWorkID(curWorkID)
+{
+$.ajax({
+	type:'post',
+	cache: false,
+	url: 'checkWorkID.php',
+	data: 
+	{
+		curWorkID: curWorkID
+	},
+	
+	success: function(output) 
+	{				
+		exists=output.match(/\d/);
+	
+		if (exists[0] === 1 || exists[0] === '1')
+		{
+			alert("You have completed this experiment before!");
+			jsPsych.endExperiment("You have completed this experiment before!");
+			document.write(' ');
+		}
+		else 
+		{
+			jsPsych.data.addProperties({worker_id: worker_id});
+		}
+	},
+	error: function (xhr, ajaxOptions, thrownError) 
+	{
+		alert(thrownError);
+	}
+});
+}
+
+			
+	
+//EXECUTE THE CHECK SUBJECTID AND WORKERID CODES
+			checkSubID(subject_id);
+			checkWorkID(worker_id);
+	
+	
+////////////////////////////////
+//START OF EXPERIMENT PLUGINS//
+///////////////////////////////
+			 
+
+//FULL SCREEN PLUGIN
+		var fullscreen = {
+        type: 'fullscreen',
+        showtext: '<p>To take part in the experiment, your browser must be in fullscreen mode. Exiting fullscreen mode will pause the experiment. <br></br>Please click the button below to enable fullscreen mode and continue.</p>',
+        buttontext: "Fullscreen",
+		data: {trialType: 'instructions'}
+		};
+
+			
+//WELCOME SCREEN PLUGIN
+	  var welcome_block = {
+		type: 'text',
+		text: ['<p style = "text-align: center; font-size: 28px"><br></br>Hello and welcome to the experiment!</p>' +
+		'<p style = "text-align: center; font-size: 28px">Press spacebar to continue.</p>'],
+		data: {label: 'welcome', trialType: 'instructions'},
+		cont_key: 32			
+		};
+
+		 
+
+//INFORMATION PAGE PLUGIN
+		var infopg = {
+		  type:'html',
+		  force_refresh: true,
+		  pages: [{
+		  url: "infopg_mome.html",
+		  cont_btn: "Continue"}]
+		 };
+		 
+		 
+		 
+//CONSENT PAGE PLUGIN
+
+//CODE TO ENSURE THAT THEY HAVE TO CHECK THE BOX BEFORE CONTINUING
+var check_consent = function(elem) {
+  if ($('#consent_checkbox').is(':checked')) {
+    return true;
+  }
+  else {
+    alert("If you wish to participate, you must check the box next to the statement 'I understand all the above and confirm that I wish to continue.'");
+    return false;
+  }
+  return false;
+};
+	 
+		var consentpg = {
+		  type:'html',
+		  force_refresh: true,
+		  pages: [{
+		  url: "consentpg_2.html",
+		  cont_btn: "Start",
+		  check_fn: check_consent}]
+		};
+				 
+			
+//ENTER SUBJECT DETAILS PLUGIN
+	    var subdetails = {
+	   		type: 'survey-text',
+	    	preamble: ['<p style = "text-align: center; font-size: 28px">Please enter the following:</p>'], 
+	    	questions: [["Subject ID?", "Session? [1 or 2]"]],
+	    	rows: [[3,3]],
+	    	columns: [[40,40]],
+	   		data: {label: 'subdetails', trialType: 'subdetails'}
+	    };
+
+	    var subdetails2 = {
+	   		type: 'survey-text',
+	    	preamble: ['<p style = "text-align: center; font-size: 28px">Please enter the following:</p>'], 
+	    	questions: [["Gender (f/m)?", "Age?"]],
+	    	rows: [[3,3]],
+	    	columns: [[40,40]],
+	   		data: {label: 'subdetails2', trialType: 'subdetails2'}
+	    };
+		
+
+//CALLS EXPERIMENT TASK (IN ANOTHER JS SCRIPT)
+		var metacog_task = metatask_mome(practice, numPrac, numBlocks, numTrials); 
+		
+		
+//END SCREEN AND SAVE FULL DATA PLUGIN
+		var end_screen = 
+		{    
+		type: 'text',    
+		text: ['<p>Thank you for participating!<br></br>Press the spacebar to end the experiment and submit your task data.</p>'],           
+		data: {trialType: 'exit', label: 'end_fullscreen'},
+		cont_key: 32,
+		on_finish: function() {
+
+
+		jsPsych.data.addProperties({
+
+
+		stimulus: [],
+		subject_id : subject_id,
+		worker_id : worker_id
+
+		});
+
+		
+		}
+
+		}
+		
+
+		
+		
+//PUSH TIMELINE FOR THE ENTIRE EXPERIMENT	
+		var tasks = [];
+
+		tasks.push(fullscreen);
+		tasks.push(welcome_block);
+		tasks.push(subdetails);
+		tasks.push(subdetails2);
+	
+		for(var i = 0; i < metacog_task.length; i++)
+		{
+			tasks.push(metacog_task[i]);   		
+		};
+  
+		tasks.push(end_screen);
+		
+
+
+//EXECUTE RUN FOR THE EXPERIMENT
+		jsPsych.init({
+		experiment_structure: tasks,
+		display_element: $('#jspsych-target'),
+		show_progress_bar: false,
+		on_trial_finish: function() {
+
+		jsPsych.data.addProperties({
+
+		subject_id : subject_id,
+		worker_id: worker_id
+
+		});
+
+		//save_data_pt([jsPsych.data.getLastTrialData()]);
+		
+
+		},
+
+
+     
+		on_finish: function() {jsPsych.data.localSave('mydata_subj' + subject_id + 'local.csv', 'csv');
+		document.write('<p><br></br><br></br><center>Thank you for participating! <br></br> Your data code is <strong>'+subject_id+'</strong>.<br> Please wait for the experimenter.</center><p>')           
+		}
+
+
+		});	   
+
+		} 
+
+		
+		
+	</script>
+</html>
+
+
+
+
+
